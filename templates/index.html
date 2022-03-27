@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% import "bootstrap/wtf.html" as wtf %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL Shortener</title>
+</head>
+<body>
+
+<div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="">Home</a>
+          </li>
+          {% if not user.is_authenticated: %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login_func')}}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('register_func')}}">Register</a>
+          </li>
+          {% else: %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('logout_func')}}">Log Out</a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('contact_func')}}">Contact</a>
+          </li>
+        </ul>
+      </div>
+{% if user.is_authenticated: %}
+    <form action="/data" method = "POST">
+        <p>Website <input type = "text" name = "Website" /></p>
+        <p>Address <input type = "text" name = "Address" /></p>
+        <p><input type = "submit" value = "Submit" /></p>
+    </form>
+{% endif %}
+</body>
+</html>
