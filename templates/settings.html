@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 {% import "bootstrap/wtf.html" as wtf %}
 <html lang="en">
@@ -39,7 +37,10 @@
   </div>
 </nav>
 
-
-{{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+<ul>
+{% for website in websites_list %}
+  <li> URL name: {{website.name}}, website address: <a href="{{website.website_address}}">{{website.website_address}}</a>,<a href="/delete/{{website.id}}">&#10060</a> </li>
+{% endfor %}
+</ul>
 </body>
 </html>

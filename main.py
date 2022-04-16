@@ -26,6 +26,7 @@ class Websites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
     website_address = db.Column(db.String(100))
+    user_name = db.Column(db.Integer)
 
 
 class Users(UserMixin, db.Model):
@@ -48,6 +49,16 @@ def index():
     return render_template("index.html", user=current_user)
 
 
+@app.route('/delete/<int:page_id>')
+@login_required
+def delete_record(page_id):
+    webpage = Websites.query.filter_by(id=page_id).first()
+    if webpage.user_name == current_user.id:
+        db.session.delete(webpage)
+        db.session.commit()
+    return redirect(url_for("user_account"))
+
+
 @app.route('/login', methods=["POST", "GET"])
 def login_func():
     form = LoginForm()
@@ -62,7 +73,7 @@ def login_func():
         else:
             login_user(user)
             return redirect(url_for("index"))
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, user=current_user)
 
 
 @app.route('/register', methods=["POST", "GET"])
@@ -81,13 +92,20 @@ def register_func():
         db.session.commit()
         login_user(new_user)
         return redirect(url_for("index"))
-    return render_template("register.html", form=form)
+    return render_template("register.html", form=form, user=current_user)
 
 
 @app.route("/logout")
 def logout_func():
     logout_user()
     return redirect(url_for("index"))
+
+
+@app.route("/settings")
+@login_required
+def user_account():
+    websites = Websites.query.filter_by(user_name=current_user.id).all()
+    return render_template("settings.html", websites_list=websites, user=current_user)
 
 
 @app.route('/contact')
@@ -102,24 +120,29 @@ def data():
     new_website = Websites(
         name=form_data["Website"],
         website_address=form_data["Address"],
+        user_name=current_user.id,
     )
     db.session.add(new_website)
     db.session.commit()
-    print(form_data)
     return redirect(url_for('index'))
 
 
+# Online for testing purposes:
 @app.route('/show')
 def print_value():
     websites = Websites.query.all()
     for website in websites:
-        print(f"{website.name}/{website.website_address}")
+        print(f"{website.name}/{website.website_address}/{website.user_name}")
     return redirect(url_for('index'))
 
 
 @app.route('/<name>')
 def reroute(name):
-    return redirect(Websites.query.filter_by(name=name).first().website_address)
+    webpage = Websites.query.filter_by(name=name).first()
+    if webpage:
+        return redirect(Websites.query.filter_by(name=name).first().website_address)
+    else:
+        return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
