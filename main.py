@@ -3,7 +3,7 @@ from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 from url_secrets import *
 from flask_login import UserMixin, current_user, login_user, logout_user, LoginManager, login_required
-from forms import RegisterForm, LoginForm, AddWebsite
+from forms import RegisterForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap
 
@@ -46,7 +46,20 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template("index.html", user=current_user)
+    show_sign_up_modal, show_login_modal = False, False
+
+    if "show_login_modal" in request.args:
+        show_login_modal = str(request.args["show_login_modal"])
+
+    if "show_sign_up_modal" in request.args:
+        show_sign_up_modal = str(request.args["show_sign_up_modal"])
+
+    print(current_user)
+
+    return render_template("index.html",
+                           user=current_user,
+                           show_login_modal=show_login_modal,
+                           show_sign_up_modal=show_sign_up_modal)
 
 
 @app.route('/delete/<int:page_id>')
@@ -61,19 +74,18 @@ def delete_record(page_id):
 
 @app.route('/login', methods=["POST", "GET"])
 def login_func():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = Users.query.filter_by(email=form.email.data).first()
+    if request.method == "POST":
+        user = Users.query.filter_by(email=request.form.get("email")).first()
         if not user:
-            flash("User does not exist!")
-            return redirect(url_for("register_func"))
-        elif not check_password_hash(user.password, form.password.data):
+            flash("User does not exist, please sign up.")
+            return redirect(url_for("index", show_sign_up_modal=True))
+        elif not check_password_hash(user.password, request.form.get("password")):
             flash("Incorrect password, please try again")
-            return redirect(url_for("login_func"))
+            return redirect(url_for("index", show_login_modal=True))
         else:
             login_user(user)
             return redirect(url_for("index"))
-    return render_template("login.html", form=form, user=current_user)
+    return redirect(url_for("index"))
 
 
 @app.route('/register', methods=["POST", "GET"])
@@ -83,7 +95,7 @@ def register_func():
         user_email = form.email.data
         if Users.query.filter_by(email=user_email).first():
             flash("User already exist!")
-            return redirect(url_for("login_func"))
+            return redirect(url_for("index", show_login_modal=True))
         new_user = Users(
             email=user_email,
             password=generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8),
@@ -127,15 +139,6 @@ def data():
     return redirect(url_for('index'))
 
 
-# Online for testing purposes:
-@app.route('/show')
-def print_value():
-    websites = Websites.query.all()
-    for website in websites:
-        print(f"{website.name}/{website.website_address}/{website.user_name}")
-    return redirect(url_for('index'))
-
-
 @app.route('/<name>')
 def reroute(name):
     webpage = Websites.query.filter_by(name=name).first()
@@ -146,5 +149,5 @@ def reroute(name):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", port=80, debug=False)
     app.run()
