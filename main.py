@@ -3,7 +3,6 @@ from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 from url_secrets import *
 from flask_login import UserMixin, current_user, login_user, logout_user, LoginManager, login_required
-from forms import RegisterForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap
 
@@ -54,8 +53,6 @@ def index():
     if "show_sign_up_modal" in request.args:
         show_sign_up_modal = str(request.args["show_sign_up_modal"])
 
-    print(current_user)
-
     return render_template("index.html",
                            user=current_user,
                            show_login_modal=show_login_modal,
@@ -84,27 +81,24 @@ def login_func():
             return redirect(url_for("index", show_login_modal=True))
         else:
             login_user(user)
-            return redirect(url_for("index"))
     return redirect(url_for("index"))
 
 
-@app.route('/register', methods=["POST", "GET"])
+@app.route('/register', methods=["POST"])
 def register_func():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        user_email = form.email.data
+    if request.method == "POST":
+        user_email = request.form.get("email")
         if Users.query.filter_by(email=user_email).first():
             flash("User already exist!")
             return redirect(url_for("index", show_login_modal=True))
         new_user = Users(
             email=user_email,
-            password=generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8),
+            password=generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8),
         )
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        return redirect(url_for("index"))
-    return render_template("register.html", form=form, user=current_user)
+    return redirect(url_for("index"))
 
 
 @app.route("/logout")
@@ -117,7 +111,7 @@ def logout_func():
 @login_required
 def user_account():
     websites = Websites.query.filter_by(user_name=current_user.id).all()
-    return render_template("settings.html", websites_list=websites, user=current_user)
+    return render_template("settings.html", websites_list=enumerate(websites), user=current_user)
 
 
 @app.route('/contact')
@@ -148,6 +142,12 @@ def reroute(name):
         return redirect(url_for("index"))
 
 
+# @app.errorhandler(404)
+# def page_not_found(e):
+#     # custom page for errors
+#     return render_template('404.html'), 404
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=False)
+    app.run(host="0.0.0.0", port=80)
     app.run()

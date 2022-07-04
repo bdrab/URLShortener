@@ -17,12 +17,11 @@ body {
     color: #fff;
 }
 
-.comp-photo{
+.top-container-photo{
     width: 60%;
 }
 
-
-.nowy{
+.main-text{
     text-align: center;
     padding-top: 6%;
     padding-left: 15%;
@@ -36,17 +35,6 @@ body {
 .sign-button{
     width: 350px;
 
-}
-
-@media (max-width: 1000px){
-    .top_container{
-        text-align: center;
-    }
-    .nowy{
-        text-align: center;
-        padding-top: 6%;
-        padding-left: 0;
-    }
 }
 
 .row {
@@ -65,7 +53,7 @@ body {
     text-align: center;
 }
 
-.nowy2{
+.user-table-data{
     width: 50%;
     margin-left: auto;
     margin-right: auto;
@@ -75,10 +63,18 @@ body {
     width: 100%;
 }
 
-.formboot {
+.user-data{
+    width: 50%;
+    margin: auto;
+}
 
-    text-align: center;
-    width: 250px;
-    margin-left: auto;
-    margin-right: auto;
+@media (max-width: 1000px){
+    .top_container{
+        text-align: center;
+    }
+    .main-text{
+        text-align: center;
+        padding-top: 6%;
+        padding-left: 0;
+    }
 }

@@ -46,10 +46,35 @@
     </nav>
   </div>
 
-<ul>
-{% for website in websites_list %}
-  <li> URL name: {{website.name}}, website address: <a href="{{website.website_address}}">{{website.website_address}}</a>,<a href="/delete/{{website.id}}">&#10060</a> </li>
-{% endfor %}
-</ul>
+
+  <div class="user-data">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">URL Name</th>
+          <th scope="col">Website Address</th>
+          <th scope="col">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for index, website in websites_list %}
+
+        {% if index % 2 == 0 %}
+        <tr class="table-primary">
+        {% else %}
+        <tr class="table-light">
+        {% endif %}
+
+          <th scope="row">{{index + 1}}</th>
+          <td>{{website.name}}</td>
+          <td>{{website.website_address}}</td>
+          <td><a href="/delete/{{website.id}}">&#10060</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+</div>
 </body>
 </html>

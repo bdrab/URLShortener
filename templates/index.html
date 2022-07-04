@@ -64,19 +64,19 @@
 
     <div class="top_container">
     <div class="row">
-        <div class="col-lg-6 nowy">
+        <div class="col-lg-6 main-text">
             <h1 class="welcome-text">Let's cut it short!</h1>
         </div>
 
         <div class="col-lg-6">
-            <img src="/static/header_photo2.jpg" class="comp-photo" alt="computer-photo">
+            <img src="/static/header_photo.jpg" class="top-container-photo" alt="computer-photo">
         </div>
     </div>
   </div>
 
     {% if user.is_authenticated: %}
     <div class="adding-page">
-    <form class="row row-cols-lg-3 g-3 align-items-center nowy2" action="/data" method = "POST">
+    <form class="row row-cols-lg-3 g-3 align-items-center user-table-data" action="/data" method = "POST">
 
       <div class="col-12">
         <label class="visually-hidden" for="inlineFormInputGroupWebsite">Username</label>
@@ -155,7 +155,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
-        <form action="/login" method = "POST">
+        <form action="/register" method = "POST">
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="signupModelInputEmail" class="form-label">Email address</label>
